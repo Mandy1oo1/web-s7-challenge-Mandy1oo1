@@ -10,8 +10,8 @@ function App({ useRouter }) {
     <RouterComponent>
       <div id="app">
         <nav>
-          <NavLink to="/" data-testid="home-link">Home</NavLink>
-          <NavLink to="/order" data-testid="order-link">Order</NavLink>
+          <NavLink to="/" data-testid="home-link">Home</NavLink> {/* Point to "/" */}
+          <NavLink to="/order" data-testid="order-link">Order</NavLink> {/* Point to "/order" */}
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />

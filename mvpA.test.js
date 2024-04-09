@@ -1,6 +1,5 @@
 /*
 Codegrade Setup
-
 1- Global setup script
 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - && sudo apt-get install -y nodejs; cg-jest install; npm i -g jest@29.6.4
 2- Per-student setup script
@@ -20,7 +19,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import server from './backend/mock-server'
 
-jest.setTimeout(3000) // default 5000 too long for Codegrade
+jest.setTimeout(750) // default 5000 too long for Codegrade
 
 const waitForOptions = { timeout: 250 }
 const queryOptions = { exact: false }
@@ -36,23 +35,16 @@ afterAll(() => { server.close() })
 beforeEach(() => { renderApp(<Router><App /></Router>) })
 afterEach(() => { server.resetHandlers() })
 
-test('renders without crashing', () => {
-  render(<App useRouter={true} />);
-});
-
 describe('Sprint 7 Challenge Codegrade Tests', () => {
   describe('App routing', () => {
     test('[1] <App /> Renders without crashing', () => {
       // screen.debug()
     })
     test('[2] The <a>Home</a> and <a>Order</a> links navigate to "/" and "/order"', () => {
-      // Click on the Order link
+      expect(document.location.pathname).toBe('/')
       fireEvent.click(screen.getByText('Order', queryOptions))
       expect(document.location.pathname).toBe('/order')
-    
-      // Click on the Home link
-      const homeLinks = screen.queryAllByText('Home', queryOptions);
-      fireEvent.click(homeLinks[0]); // Assuming the first element is the desired one
+      fireEvent.click(screen.getByText('Home', queryOptions))
       expect(document.location.pathname).toBe('/')
     })
     test('[3] Renders the <Home /> component on path "/"', () => {
@@ -157,18 +149,37 @@ describe('Sprint 7 Challenge Codegrade Tests', () => {
       getFormElements()
     })
     test('[9] Submit only enables if `fullName` and `size` pass validation', async () => {
-      const name = screen.getByLabelText('Full Name');
-      const size = screen.getByLabelText('Size');
-      const submit = screen.getByText('Order Your Pizza').closest('form').querySelector('input[type="submit"]');
-    
-      fireEvent.change(name, { target: { value: '12' } });
-      fireEvent.change(size, { target: { value: 'S' } });
-    
-      // Wait for validation to complete
+      expect(submit).toBeDisabled() // initial state
       await waitFor(() => {
-        expect(submit).not.toBeDisabled();
-      });
-    });
+        fireEvent.change(name, { target: { value: '123' } })
+        fireEvent.change(size, { target: { value: 'S' } })
+      }, waitForOptions)
+      await waitFor(() => expect(submit).toBeEnabled())
+
+      await waitFor(() => {
+        fireEvent.change(name, { target: { value: '12' } }) // BAD VALUE
+        fireEvent.change(size, { target: { value: 'S' } })
+      }, waitForOptions)
+      await waitFor(() => expect(submit).toBeDisabled())
+
+      await waitFor(() => {
+        fireEvent.change(name, { target: { value: '123' } })
+        fireEvent.change(size, { target: { value: 'M' } })
+      }, waitForOptions)
+      await waitFor(() => expect(submit).toBeEnabled())
+
+      await waitFor(() => {
+        fireEvent.change(name, { target: { value: '123' } })
+        fireEvent.change(size, { target: { value: 'X' } }) // BAD VALUE
+      }, waitForOptions)
+      await waitFor(() => expect(submit).toBeDisabled())
+
+      await waitFor(() => {
+        fireEvent.change(name, { target: { value: '123' } })
+        fireEvent.change(size, { target: { value: 'L' } })
+      }, waitForOptions)
+      await waitFor(() => expect(submit).toBeEnabled())
+    })
     test('[10] Validation of `fullName` renders correct error message', async () => {
       const validationError = 'full name must be at least 3 characters'
 

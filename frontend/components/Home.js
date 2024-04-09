@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from React Router
+import { Link } from 'react-router-dom';
 import pizza from './images/pizza.jpg';
 
 function Home() {
@@ -8,7 +8,7 @@ function Home() {
       <h2>
         Welcome to Bloom Pizza!
       </h2>
-      {/* Wrap the image with Link */}
+      {/* Point the Link component to "/order" */}
       <Link to="/order">
         <img alt="order-pizza" style={{ cursor: 'pointer' }} src={pizza} />
       </Link>
