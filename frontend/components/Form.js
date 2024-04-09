@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
+
 
 // Validation schema
 const validationErrors = {
-  fullNameTooShort: 'full name must be at least 3 characters',
-  fullNameTooLong: 'full name must be at most 20 characters',
-  sizeIncorrect: 'size must be S or M or L'
+  fullNameTooShort: 'Full name must be at least 3 characters',
+  fullNameTooLong: 'Full name must be at most 20 characters',
+  sizeIncorrect: 'Size must be S or M or L'
 }; 
+
 
 const schema = Yup.object().shape({
   fullName: Yup.string()
@@ -27,11 +30,21 @@ const toppings = [
 ];
 
 export default function Form() {
+  const [successMessage, setSuccessMessage] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     size: '',
     toppings: [],
   });
+
+  useEffect(() => {
+    if (formSuccess) {
+      setSuccessMessage(`Thank you for your order, ${formData.fullName}! Your ${formData.size.toLowerCase()} pizza with ${formData.toppings.length > 0 ? formData.toppings.length : 'no'} topping${formData.toppings.length !== 1 ? 's' : ''}.`);
+    } else {
+      setSuccessMessage('');
+    }
+  }, [formSuccess, formData]);
+
 
   const [formErrors, setFormErrors] = useState({});
   const [formSuccess, setFormSuccess] = useState(false);
@@ -70,7 +83,7 @@ export default function Form() {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Order Your Pizza</h2>
-      {formSuccess && <div className='success'>Thank you for your order!</div>}
+      {formSuccess && <div className='success'>{successMessage}</div>}
       {formFailure && <div className='failure'>Something went wrong</div>}
 
       <div className="input-group">
@@ -121,6 +134,8 @@ export default function Form() {
       </div>
       
       <input type="submit" disabled={!formData.fullName || !formData.size} />
+      <Link to="/">Back to Home</Link>
     </form>
   );
+  
 }

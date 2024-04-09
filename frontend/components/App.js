@@ -1,23 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom'; // Import NavLink from react-router-dom
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import Home from './Home';
 import Form from './Form';
 
-function App() {
+function App({ useRouter }) {
+  const RouterComponent = useRouter ? Router : React.Fragment;
+
   return (
-    <Router>
+    <RouterComponent>
       <div id="app">
         <nav>
-          {/* Use NavLink instead of NavLink */}
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="/order">Order</NavLink>
+          <NavLink to="/" data-testid="home-link">Home</NavLink>
+          <NavLink to="/order" data-testid="order-link">Order</NavLink>
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/order" element={<Form />} />
         </Routes>
       </div>
-    </Router>
+    </RouterComponent>
   );
 }
 
