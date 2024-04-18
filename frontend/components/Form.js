@@ -18,7 +18,7 @@ export default function Form() {
 
   const schema = Yup.object().shape({
     fullName: Yup.string().min(3, validationErrors.fullNameTooShort).max(20, validationErrors.fullNameTooLong).required(),
-    size: Yup.string().matches(/^(S|M|L)$/, validationErrors.sizeIncorrect).required(),
+    size: Yup.string().matches(/^(S|M|L)$/, validationErrors.sizeIncorrect),
   });
 
   const [errors, setErrors] = useState({});
@@ -29,6 +29,8 @@ export default function Form() {
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [selectedToppings, setSelectedToppings] = useState({});
   const [successMessage, setSuccessMessage] = useState('')
+  const [fullNameTouched, setFullNameTouched] = useState(false)
+  const [sizeTouched, setSizeTouched] = useState(false)
 
   useEffect(() => {
     setSubmitDisabled(Object.keys(errors).length > 0 || !fullName || !size);
@@ -52,18 +54,34 @@ export default function Form() {
       } else {
         errors[validationError.path] = validationError.message;
       }
+      console.log(errors)
+      if (!fullNameTouched){
+        errors.fullName = null
+      }
+      if (!sizeTouched){
+        errors.size = null
+      }
       setErrors(errors);
     }
   };
 
+  useEffect(() =>{
+    validateForm()
+  }, [fullName, size]) 
+
   const handleFullNameChange = (e) => {
+    if (e.target.value.length > 0){
+      e.target.value = e.target.value.trim()
+    }
     setFullName(e.target.value);
-    validateForm();
+    setFullNameTouched(true)
+    // validateForm();
   };
 
   const handleSizeChange = (e) => {
     setSize(e.target.value);
-    validateForm();
+    setSizeTouched(true)
+    // validateForm();
   };
 
   const handleCheckboxChange = (e) => {
@@ -117,7 +135,7 @@ export default function Form() {
    
 
   return (
-    <form onSubmit={handleSubmit} /*onChange={checkForErrors}*/>
+    <form onSubmit={handleSubmit}>
       <h2>Order Your Pizza</h2>
       {success && (
   <div className='success'>
